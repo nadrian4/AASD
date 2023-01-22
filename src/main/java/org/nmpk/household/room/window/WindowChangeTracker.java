@@ -36,5 +36,6 @@ public class WindowChangeTracker extends AbstractHouseholdActorWithFSM<WindowSta
                     return stay();
                 }
         ));
+        initialize();
     }
 }

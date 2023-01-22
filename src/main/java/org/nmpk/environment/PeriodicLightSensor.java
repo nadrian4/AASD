@@ -6,13 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
-class PeriodicSignalPhotoCellSensor extends PeriodicSignalSensor implements PhotoCellSensor {
-
+class PeriodicLightSensor extends PeriodicSignalSensor {
     private final String name;
     private final ActorRef signalReceiver;
 
-    PeriodicSignalPhotoCellSensor(ActorRef signalReceiver) {
-        super(new RandomEmitIntervalSupplier(50, 150));
+    PeriodicLightSensor(ActorRef signalReceiver) {
+        super(new RandomEmitIntervalSupplier(10, 50));
         this.name = self().path().name();
         this.signalReceiver = signalReceiver;
     }
@@ -20,7 +19,7 @@ class PeriodicSignalPhotoCellSensor extends PeriodicSignalSensor implements Phot
     @Override
     void emitSignal() {
         long signalId = ThreadLocalRandom.current().nextLong();
-        PhotoCellSignal signal = new PhotoCellSignal(name, signalId);
+        LightSignal signal = new LightSignal(name, signalId);
         signalReceiver.tell(signal, self());
     }
 }

@@ -10,7 +10,7 @@ import java.util.concurrent.ThreadLocalRandom;
 class CrowdActorSetup {
     static ActorRef setupCrowdActor(ActorSystem system, String roomId) {
         ActorRef roomEnterActor = RoomEnterSetup.setupRoomEnter(system, roomId);
-        long initialPplCount = ThreadLocalRandom.current().nextLong() % 8 + 2;
+        long initialPplCount = ThreadLocalRandom.current().nextLong(1, 4);
         return system.actorOf(Props.create(CrowdActor.class, initialPplCount, roomId, roomEnterActor), "CrowdActor-" + roomId);
     }
 }

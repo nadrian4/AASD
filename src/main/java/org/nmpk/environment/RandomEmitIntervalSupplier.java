@@ -21,6 +21,6 @@ class RandomEmitIntervalSupplier implements Supplier<Long> {
 
     @Override
     public Long get() {
-        return minInterval + ThreadLocalRandom.current().nextLong() % (maxInterval - minInterval);
+        return ThreadLocalRandom.current().nextLong(minInterval, maxInterval);
     }
 }
