@@ -7,7 +7,7 @@ import java.text.DecimalFormat;
 @Getter
 @EqualsAndHashCode
 @RequiredArgsConstructor
-class NewTemperatureRead {
+public class NewTemperatureRead {
     private static final DecimalFormat temperatureFormat = new DecimalFormat("0.00");
     final double temperature;
     final TemperatureUnit unit = TemperatureUnit.CELSIUS;

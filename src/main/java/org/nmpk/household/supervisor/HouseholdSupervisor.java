@@ -2,18 +2,18 @@ package org.nmpk.household.supervisor;
 
 import akka.japi.pf.ReceiveBuilder;
 import org.nmpk.household.AbstractHouseholdActor;
-import org.nmpk.household.room.ControlRoomActors;
+import org.nmpk.household.room.RoomActors;
 import org.nmpk.household.room.command.LightCommandType;
 import org.nmpk.household.room.command.LightTurnCommand;
 
 import java.util.Map;
 
 public class HouseholdSupervisor extends AbstractHouseholdActor {
-    private final Map<String, ControlRoomActors> roomControllers;
+    private final Map<String, RoomActors> roomControllers;
 
-    HouseholdSupervisor(Map<String, ControlRoomActors> roomControllers) {
+    HouseholdSupervisor(Map<String, RoomActors> roomControllers) {
         this.roomControllers = roomControllers;
-        for (ControlRoomActors value : roomControllers.values()) {
+        for (RoomActors value : roomControllers.values()) {
             value.getRoomController()
                     .tell(new LightTurnCommand(LightCommandType.on), self());
         }

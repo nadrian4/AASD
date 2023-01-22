@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Builder(toBuilder = true)
 @Data
-public class ControlRoomActors {
+public class RoomActors {
     ActorRef stateAggregatorActor;
     ActorRef roomController;
 }
