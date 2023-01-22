@@ -24,7 +24,7 @@ public class TemperatureActor extends AbstractHouseholdActor {
         return builder
                 .match(NewTemperatureRead.class, newTemperatureRead -> {
                     this.currentRead = newTemperatureRead;
-                    log.info("New temperature is: {}", newTemperatureRead);
+                    log.debug("New temperature is: {}", newTemperatureRead);
                 })
                 ;
     }

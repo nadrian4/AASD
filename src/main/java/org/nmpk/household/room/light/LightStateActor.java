@@ -20,11 +20,11 @@ public class LightStateActor extends AbstractHouseholdActor {
         return builder
                 .match(LightOn.class, w -> {
                     this.isOpen = true;
-                    log.info("light on: {}", lightId);
+                    log.debug("light on: {}", lightId);
                 })
                 .match(LightOff.class, w -> {
                     this.isOpen = false;
-                    log.info("light off: {}", lightId);
+                    log.debug("light off: {}", lightId);
                 })
                 ;
     }

@@ -24,11 +24,11 @@ public class CrowdActor extends AbstractHouseholdActor {
         return builder
                 .match(EnteredRoom.class, e -> {
                     peopleInRoom++;
-                    log.info("Someone entered. People in room: {}", peopleInRoom);
+                    log.debug("Someone entered. People in room: {}", peopleInRoom);
                 })
                 .match(LeftRoom.class, e -> {
                     peopleInRoom = Math.max(0, peopleInRoom - 1);
-                    log.info("Someone left. People in room: {}", peopleInRoom);
+                    log.debug("Someone left. People in room: {}", peopleInRoom);
                 });
     }
 }

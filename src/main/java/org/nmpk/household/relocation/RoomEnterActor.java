@@ -110,12 +110,10 @@ public class RoomEnterActor extends AbstractHouseholdActorWithFSM<RelocationStat
     }
 
     private void onRoomEntered(String roomId) {
-//        log.info("Yaaay! someone entered the room {}", roomId);
         subscribers.forEach(s -> s.tell(new EnteredRoom(), self()));
     }
 
     private void onRoomLeft(String roomId) {
-//        log.info("Yaaay! someone left the room {}", roomId);
         subscribers.forEach(s -> s.tell(new LeftRoom(), self()));
     }
 }

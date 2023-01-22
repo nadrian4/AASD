@@ -8,8 +8,6 @@ import org.nmpk.setup.ApartmentSetup;
 class Main {
     public static void main(String[] args) throws InterruptedException {
         ActorSystem system = ActorSystem.create("PhotoCell");
-//        EnvironmentSetup.setupEnvironment(system);
         ApartmentSetup.setupApartment(system);
-        log.info("Still running");
     }
 }

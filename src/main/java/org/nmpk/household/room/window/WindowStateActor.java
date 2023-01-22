@@ -20,11 +20,11 @@ public class WindowStateActor extends AbstractHouseholdActor {
         return builder
                 .match(WindowOpened.class, w -> {
                     this.isOpen = true;
-                    log.info("Window opened: {}", windowId);
+                    log.debug("Window opened: {}", windowId);
                 })
                 .match(WindowClosed.class, w -> {
                     this.isOpen = false;
-                    log.info("Window closed: {}", windowId);
+                    log.debug("Window closed: {}", windowId);
                 })
                 ;
     }

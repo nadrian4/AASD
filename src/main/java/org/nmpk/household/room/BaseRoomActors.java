@@ -1,14 +1,12 @@
 package org.nmpk.household.room;
 
 import akka.actor.ActorRef;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-@Builder
+@Builder(toBuilder = true)
 @Data
-@AllArgsConstructor
-public class RoomActors {
+public class BaseRoomActors {
     ActorRef crowdActor;
     ActorRef windowActor;
     ActorRef lightActor;

@@ -34,7 +34,7 @@ public class PhotoCellActor extends AbstractHouseholdActor {
     }
 
     private void onSubscribeRequest(SubscribePhotoCell s) {
-        log.info("New subscriber: {}", s);
+        log.debug("New subscriber: {}", s);
         subscribers.add(s.getUpdatesReceiver());
     }
 }
