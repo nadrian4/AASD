@@ -4,6 +4,7 @@ import akka.actor.ActorRef;
 import akka.japi.pf.ReceiveBuilder;
 import akka.protobuf.LazyStringArrayList;
 import org.nmpk.household.AbstractHouseholdActor;
+import org.nmpk.household.room.command.TemperatureChangeCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +39,9 @@ public class TemperatureActor extends AbstractHouseholdActor {
                 .match(SubscribeTemperature.class, subscribeTemperature -> {
                     log.debug("New subscriber: {}", subscribeTemperature);
                     this.subscribers.add(subscribeTemperature.getSubscriber());
+                })
+                .match(TemperatureChangeCommand.class, temperatureChangeCommand -> {
+                    
                 })
                 ;
     }

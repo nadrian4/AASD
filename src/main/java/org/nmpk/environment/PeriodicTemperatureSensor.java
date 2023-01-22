@@ -12,7 +12,7 @@ class PeriodicTemperatureSensor extends PeriodicSignalSensor implements PhotoCel
     private final ActorRef signalReceiver;
 
     PeriodicTemperatureSensor(ActorRef signalReceiver) {
-        super(new RandomEmitIntervalSupplier(200, 1000));
+        super(new RandomEmitIntervalSupplier(20, 30));
         this.name = self().path().name();
         this.signalReceiver = signalReceiver;
     }
