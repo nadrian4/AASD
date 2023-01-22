@@ -2,6 +2,8 @@ package org.nmpk.household.room.temperature;
 
 import akka.actor.ActorRef;
 import akka.japi.pf.ReceiveBuilder;
+import org.nmpk.environment.TemperatureLowered;
+import org.nmpk.environment.TemperatureRaised;
 import org.nmpk.environment.TemperatureSignal;
 import org.nmpk.environment.WindowSignal;
 import org.nmpk.household.AbstractHouseholdActor;
@@ -34,10 +36,24 @@ public class TemperatureChangeTracker extends AbstractHouseholdActor {
                         int changeDirection = ThreadLocalRandom.current().nextLong() % 2 == 0   ? -1 : 1;
                         double multiplier = ThreadLocalRandom.current().nextDouble(0, 1) ;
                         double change = (maxTemp - minTemp) * multiplier * (remainder % 10) / 100.0;
-                        double newTemperature = Math.max(Math.min(lastRead + changeDirection * change, maxTemp), minTemp);
-                        temperatureActor.tell(new NewTemperatureRead(newTemperature), self());
-                        lastRead = newTemperature;
+                        lastRead = Math.max(Math.min(lastRead + changeDirection * change, maxTemp), minTemp);
+                        broadcastTemperature();
                     }
-                });
+                })
+                .match(TemperatureRaised.class, temperatureRaised -> {
+                    log.info("Raised by {}", temperatureRaised.getDelta());
+                    lastRead = lastRead + temperatureRaised.getDelta();
+                    broadcastTemperature();
+                })
+                .match(TemperatureLowered.class, temperatureLowered -> {
+                    log.info("Lowered by {}", temperatureLowered.getDelta());
+                    lastRead = lastRead - temperatureLowered.getDelta();
+                    broadcastTemperature();
+                })
+                ;
+    }
+
+    private void broadcastTemperature() {
+        temperatureActor.tell(new NewTemperatureRead(lastRead), self());
     }
 }

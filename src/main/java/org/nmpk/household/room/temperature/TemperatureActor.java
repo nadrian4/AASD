@@ -3,8 +3,10 @@ package org.nmpk.household.room.temperature;
 import akka.actor.ActorRef;
 import akka.japi.pf.ReceiveBuilder;
 import akka.protobuf.LazyStringArrayList;
+import org.nmpk.environment.TemperatureController;
 import org.nmpk.household.AbstractHouseholdActor;
 import org.nmpk.household.room.command.TemperatureChangeCommand;
+import org.nmpk.household.room.command.TemperatureCommandType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,15 +16,17 @@ import java.util.Set;
 
 public class TemperatureActor extends AbstractHouseholdActor {
     private final Logger log;
+    private final TemperatureController temperatureController;
     boolean isOpen;
     private final String temperatureReaderId;
     private NewTemperatureRead currentRead;
     private final Set<ActorRef> subscribers;
 
-    public TemperatureActor(String temperatureReaderId) {
+    public TemperatureActor(String temperatureReaderId, TemperatureController temperatureController) {
         this.log = LoggerFactory.getLogger(TemperatureActor.class.getName() + "-" + temperatureReaderId);
         this.temperatureReaderId = temperatureReaderId;
         this.currentRead = NewTemperatureRead.empty();
+        this.temperatureController = temperatureController;
         this.subscribers = new HashSet<>();
     }
 
@@ -41,7 +45,11 @@ public class TemperatureActor extends AbstractHouseholdActor {
                     this.subscribers.add(subscribeTemperature.getSubscriber());
                 })
                 .match(TemperatureChangeCommand.class, temperatureChangeCommand -> {
-                    
+                    if (temperatureChangeCommand.getCommandType() == TemperatureCommandType.lower) {
+                        temperatureController.lower(temperatureChangeCommand.getDelta());
+                    } else {
+                        temperatureController.raise(temperatureChangeCommand.getDelta());
+                    }
                 })
                 ;
     }

@@ -33,7 +33,7 @@ public class RoomController extends AbstractHouseholdActorWithFSM<RoomState, Int
     RoomController(BaseRoomActors roomActors, String roomId) {
         this.log = LoggerFactory.getLogger(RoomController.class.getName() + "-" + roomId);
         this.roomActors = roomActors;
-        Supplier<Long> periodSupplier = () -> Duration.ofSeconds(1).toMillis();
+        Supplier<Long> periodSupplier = () -> Duration.ofMillis(300).toMillis();
         this.periodicActor = context().system().actorOf(Props.create(PeriodicActor.class, periodSupplier, self()));
         roomActors.getCrowdActor().tell(new SubscribeCrowd(self()), self());
         roomActors.getWindowActor().tell(new SubscribeWindow(self()), self());
@@ -45,39 +45,69 @@ public class RoomController extends AbstractHouseholdActorWithFSM<RoomState, Int
     private void initializeStateMachine() {
         startWith(RoomState.normal, 0);
         when(RoomState.normal, normalMatch()
-            .event(PeriodicActor.Tick.class, (tick, __) -> {
-                System.out.println("NO TICK PRZYSZED");
-                return stay();
-            }));
-        when(RoomState.highTemperature, normalMatch()
                 .event(PeriodicActor.Tick.class, (tick, __) -> {
-                    self().tell(new TemperatureChangeCommand(TemperatureCommandType.lower, currentTempRead.getTemperature() * 0.0001d), self());
-                    return stay();
-                }));
-        when(RoomState.lowTemperature, normalMatch()
-                .event(PeriodicActor.Tick.class, (tick, __) -> {
-                    self().tell(new TemperatureChangeCommand(TemperatureCommandType.raise, currentTempRead.getTemperature() * 0.0001d), self());
+                    periodicActor.tell(new PeriodicActor.End(), self());
                     return stay();
                 })
+                .event(NewTemperatureRead.class, (msg, __) -> {
+                    onNewTemperature(msg);
+                    if (msg.isHigh()) {
+                        return goTo(RoomState.highTemperature);
+                    } else if (msg.isLow()) {
+                        return goTo(RoomState.lowTemperature);
+                    } else {
+                        return stay();
+                    }
+                })
         );
+        when(RoomState.highTemperature, normalMatch()
+                .event(PeriodicActor.Tick.class, (tick, __) -> {
+                    self().tell(new TemperatureChangeCommand(TemperatureCommandType.lower, currentTempRead.getTemperature() * 0.01d), self());
+                    return stay();
+                })
+                .event(NewTemperatureRead.class, (msg, __) -> {
+                    onNewTemperature(msg);
+                    if (msg.isLow()) {
+                        return goTo(RoomState.lowTemperature);
+                    } else if (msg.isHigh()) {
+                        return stay();
+                    } else {
+                        return goTo(RoomState.normal);
+                    }
+                })
+        );
+        when(RoomState.lowTemperature, normalMatch()
+                .event(PeriodicActor.Tick.class, (tick, __) -> {
+                    self().tell(new TemperatureChangeCommand(TemperatureCommandType.raise, currentTempRead.getTemperature() * 0.01d), self());
+                    return stay();
+                })
+                .event(NewTemperatureRead.class, (msg, __) -> {
+                    onNewTemperature(msg);
+                    if (msg.isHigh()) {
+                        return goTo(RoomState.highTemperature);
+                    } else if (msg.isLow()) {
+                        return stay();
+                    } else {
+                        return goTo(RoomState.normal);
+                    }
+                })
+        );
+
         onTransition(matchState(RoomState.highTemperature, RoomState.normal, () -> {
             log.info("Temperature is normal now: {}", currentTempRead);
             periodicActor.tell(new PeriodicActor.End(), self());
-        }));
-        onTransition(matchState(RoomState.lowTemperature, RoomState.normal, () -> {
+        })
+        .state(RoomState.lowTemperature, RoomState.normal, () -> {
             log.info("Temperature is normal now: {}", currentTempRead);
             periodicActor.tell(new PeriodicActor.End(), self());
-        }));
-        onTransition(matchState(RoomState.normal, RoomState.highTemperature, () -> {
+        }).state(RoomState.normal, RoomState.highTemperature, () -> {
             log.info("Temperature is high now: {}", currentTempRead);
             periodicActor.tell(new PeriodicActor.FirstTick(), self());
-        }));
-        onTransition(matchState(RoomState.normal, RoomState.highTemperature, () -> {
+        }).state(RoomState.normal, RoomState.lowTemperature, () -> {
             log.info("Temperature is low now: {}", currentTempRead);
             periodicActor.tell(new PeriodicActor.FirstTick(), self());
         }));
         initialize();
-        this.periodicActor.tell(new PeriodicActor.End(), self());
     }
 
     private FSMStateFunctionBuilder<RoomState, Integer> normalMatch() {
@@ -104,16 +134,6 @@ public class RoomController extends AbstractHouseholdActorWithFSM<RoomState, Int
                 .event(LightSwitched.class, (msg, __) -> {
                     onLightSwitched(msg);
                     return stay();
-                })
-                .event(NewTemperatureRead.class, (msg, __) -> {
-                    onNewTemperature(msg);
-                    if (currentTempRead.isHigh()) {
-                        return goTo(RoomState.highTemperature);
-                    } else if (currentTempRead.isLow()) {
-                        return goTo(RoomState.lowTemperature);
-                    } else {
-                        return goTo(RoomState.normal);
-                    }
                 });
     }
 
