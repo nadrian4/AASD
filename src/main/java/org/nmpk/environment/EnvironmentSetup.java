@@ -23,4 +23,8 @@ public class EnvironmentSetup {
     public static void setupTemperatureSensor(ActorSystem system, String temperatureId, ActorRef temperatureTracker) {
         system.actorOf(Props.create(PeriodicTemperatureSensor.class, temperatureTracker), temperatureId + "-Sensor-1");
     }
+
+    public static void setupDeviceSensor(ActorSystem system, String deviceId, ActorRef deviceTracker) {
+        system.actorOf(Props.create(PeriodicDeviceSensor.class, deviceTracker), deviceId + "-Sensor-1");
+    }
 }

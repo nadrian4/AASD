@@ -20,7 +20,7 @@ public class WindowChangeTracker extends AbstractHouseholdActorWithFSM<WindowSta
         startWith(WindowState.closed, 0);
         when(WindowState.closed, matchEvent(
                 WindowSignal.class, (c, d) -> {
-                    if (c.getId() % 500 == 0) {
+                    if (c.getValue() % 500 == 0) {
                         windowStateActor.tell(new WindowOpened(), self());
                         return goTo(WindowState.opened);
                     }
@@ -29,7 +29,7 @@ public class WindowChangeTracker extends AbstractHouseholdActorWithFSM<WindowSta
         ));
         when(WindowState.opened, matchEvent(
                 WindowSignal.class, (c, d) -> {
-                    if (c.getId() % 500 == 0) {
+                    if (c.getValue() % 500 == 0) {
                         windowStateActor.tell(new WindowClosed(), self());
                         return goTo(WindowState.closed);
                     }

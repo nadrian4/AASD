@@ -1,8 +1,8 @@
 package org.nmpk.environment;
 
 import akka.actor.ActorRef;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.nmpk.household.room.temperature.TemperatureController;
 
 import java.util.Optional;
 

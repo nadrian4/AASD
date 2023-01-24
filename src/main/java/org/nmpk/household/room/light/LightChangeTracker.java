@@ -20,7 +20,7 @@ public class LightChangeTracker extends AbstractHouseholdActorWithFSM<LightState
         startWith(LightState.off, 0);
         when(LightState.off, matchEvent(
                 LightSignal.class, (c, d) -> {
-                    if (c.getId() % 500 == 0) {
+                    if (c.getValue() % 500 == 0) {
                         lightStateActor.tell(new LightOn(), self());
                         return goTo(LightState.on);
                     }
@@ -29,7 +29,7 @@ public class LightChangeTracker extends AbstractHouseholdActorWithFSM<LightState
         ));
         when(LightState.on, matchEvent(
                 LightSignal.class, (c, d) -> {
-                    if (c.getId() % 500 == 0) {
+                    if (c.getValue() % 500 == 0) {
                         lightStateActor.tell(new LightOff(), self());
                         return goTo(LightState.off);
                     }

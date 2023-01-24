@@ -1,4 +1,4 @@
-package org.nmpk.environment;
+package org.nmpk.household.room.temperature;
 
 public interface TemperatureController {
     void raise(double delta);

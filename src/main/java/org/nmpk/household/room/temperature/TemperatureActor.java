@@ -2,15 +2,12 @@ package org.nmpk.household.room.temperature;
 
 import akka.actor.ActorRef;
 import akka.japi.pf.ReceiveBuilder;
-import akka.protobuf.LazyStringArrayList;
-import org.nmpk.environment.TemperatureController;
 import org.nmpk.household.AbstractHouseholdActor;
 import org.nmpk.household.room.command.TemperatureChangeCommand;
 import org.nmpk.household.room.command.TemperatureCommandType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.Set;
 

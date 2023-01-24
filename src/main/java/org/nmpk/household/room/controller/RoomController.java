@@ -5,12 +5,12 @@ import akka.actor.Props;
 import akka.japi.pf.FSMStateFunctionBuilder;
 import org.nmpk.household.AbstractHouseholdActorWithFSM;
 import org.nmpk.household.room.BaseRoomActors;
-import org.nmpk.household.room.command.LightTurnCommand;
-import org.nmpk.household.room.command.TemperatureChangeCommand;
-import org.nmpk.household.room.command.TemperatureCommandType;
-import org.nmpk.household.room.command.WindowCommand;
+import org.nmpk.household.room.command.*;
 import org.nmpk.household.room.crowd.CrowdState;
 import org.nmpk.household.room.crowd.SubscribeCrowd;
+import org.nmpk.household.room.electrics.PowerConsumptionRead;
+import org.nmpk.household.room.electrics.SubscribeAllDevices;
+import org.nmpk.household.room.electrics.SubscribeDevice;
 import org.nmpk.household.room.light.LightSwitched;
 import org.nmpk.household.room.light.SubscribeLight;
 import org.nmpk.household.room.temperature.NewTemperatureRead;
@@ -39,6 +39,7 @@ public class RoomController extends AbstractHouseholdActorWithFSM<RoomState, Int
         roomActors.getWindowActor().tell(new SubscribeWindow(self()), self());
         roomActors.getLightActor().tell(new SubscribeLight(self()), self());
         roomActors.getTemperatureActor().tell(new SubscribeTemperature(self()), self());
+        roomActors.getDevicesActor().tell(new SubscribeAllDevices(self()), self());
         initializeStateMachine();
     }
 
@@ -102,6 +103,7 @@ public class RoomController extends AbstractHouseholdActorWithFSM<RoomState, Int
             periodicActor.tell(new PeriodicActor.End(), self());
         }).state(RoomState.normal, RoomState.highTemperature, () -> {
             log.info("Temperature is high now: {}", currentTempRead);
+            roomActors.getDevicesActor().tell(new AllDevicesCommand(DeviceCommandType.turnOff), self());
             periodicActor.tell(new PeriodicActor.FirstTick(), self());
         }).state(RoomState.normal, RoomState.lowTemperature, () -> {
             log.info("Temperature is low now: {}", currentTempRead);
@@ -134,7 +136,16 @@ public class RoomController extends AbstractHouseholdActorWithFSM<RoomState, Int
                 .event(LightSwitched.class, (msg, __) -> {
                     onLightSwitched(msg);
                     return stay();
-                });
+                })
+                .event(PowerConsumptionRead.class, (msg, __) -> {
+                    onPowerConsumptionRead(msg);
+                    return stay();
+                })
+                ;
+    }
+
+    private void onPowerConsumptionRead(PowerConsumptionRead msg) {
+
     }
 
     private void onNewWindowState(NewWindowState newWindowState) {

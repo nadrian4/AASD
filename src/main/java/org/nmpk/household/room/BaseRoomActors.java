@@ -11,4 +11,5 @@ public class BaseRoomActors {
     ActorRef windowActor;
     ActorRef lightActor;
     ActorRef temperatureActor;
+    ActorRef devicesActor;
 }

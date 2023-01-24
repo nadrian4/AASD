@@ -5,12 +5,10 @@ import akka.japi.pf.ReceiveBuilder;
 import org.nmpk.environment.TemperatureLowered;
 import org.nmpk.environment.TemperatureRaised;
 import org.nmpk.environment.TemperatureSignal;
-import org.nmpk.environment.WindowSignal;
 import org.nmpk.household.AbstractHouseholdActor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class TemperatureChangeTracker extends AbstractHouseholdActor {
@@ -31,7 +29,7 @@ public class TemperatureChangeTracker extends AbstractHouseholdActor {
     protected ReceiveBuilder addToReceive(ReceiveBuilder builder) {
         return builder
                 .match(TemperatureSignal.class, temperatureSignal -> {
-                    double remainder = temperatureSignal.getId() % 10;
+                    double remainder = temperatureSignal.getValue() % 10;
                     if (remainder == 1 || remainder == 3 || remainder == 5) {
                         int changeDirection = ThreadLocalRandom.current().nextLong() % 2 == 0   ? -1 : 1;
                         double multiplier = ThreadLocalRandom.current().nextDouble(0, 1) ;
